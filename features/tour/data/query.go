@@ -1,33 +1,27 @@
 package data
 
 import (
-	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"mime/multipart"
-	"my-tourist-ticket/app/cache"
 	cd "my-tourist-ticket/features/city/data"
 	pd "my-tourist-ticket/features/package/data"
 	"my-tourist-ticket/features/tour"
 	"my-tourist-ticket/features/user"
 	"my-tourist-ticket/utils/cloudinary"
-	"time"
 
 	"gorm.io/gorm"
 )
 
 type tourQuery struct {
 	db            *gorm.DB
-	redisClient   cache.RedisInterface
 	uploadService cloudinary.CloudinaryUploaderInterface
 }
 
-func NewTour(db *gorm.DB, redisClient cache.RedisInterface, cloud cloudinary.CloudinaryUploaderInterface) tour.TourDataInterface {
+func NewTour(db *gorm.DB, cloud cloudinary.CloudinaryUploaderInterface) tour.TourDataInterface {
 	return &tourQuery{
 		db:            db,
-		redisClient:   redisClient,
 		uploadService: cloud,
 	}
 }
@@ -248,30 +242,6 @@ func (repo *tourQuery) SelectTourByPengelola(userId int, page, limit int) ([]tou
 
 // GetTourByCityID implements tour.TourDataInterface.
 func (repo *tourQuery) GetTourByCityID(cityID uint, page, limit int) ([]tour.Core, int, error) {
-	ctx := context.Background()
-	cacheKey := fmt.Sprintf("city:%d:tours:page%d:limit%d", cityID, page, limit)
-
-	// Cek apakah data ada di cache Redis
-	cachedData, err := repo.redisClient.Get(ctx, cacheKey)
-	if err == nil {
-		// Jika data ada di cache, gunakan data dari cache
-		log.Printf("Data for key '%s' found in Redis cache", cacheKey)
-		var tours []tour.Core
-		if err := json.Unmarshal([]byte(cachedData), &tours); err != nil {
-			log.Printf("Failed to unmarshal cached data for key '%s': %v", cacheKey, err)
-		}
-
-		var totalData int64
-		query := repo.db.Where("city_id = ?", cityID).Order("created_at desc")
-		if err := query.Model(&Tour{}).Count(&totalData).Error; err != nil {
-			return nil, 0, err
-		}
-		totalPage := int((totalData + int64(limit) - 1) / int64(limit))
-
-		return tours, totalPage, nil
-	}
-
-	// Jika data tidak ada di cache, ambil dari database
 	var city []cd.City
 	if err := repo.db.First(&city, cityID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -313,18 +283,6 @@ func (repo *tourQuery) GetTourByCityID(cityID uint, page, limit int) ([]tour.Cor
 		t.Package.Price = minPrice
 		core := ModelToCore(t)
 		tourCore = append(tourCore, core)
-	}
-
-	// Simpan data ke cache Redis untuk digunakan selanjutnya
-	cacheExpiration := time.Hour * 1 // Misalnya, atur expiration time menjadi 1 jam
-	jsonData, err := json.Marshal(tourCore)
-	if err != nil {
-		log.Printf("Failed to marshal data for caching: %v", err)
-	} else {
-		err := repo.redisClient.Set(ctx, cacheKey, string(jsonData), cacheExpiration)
-		if err != nil {
-			log.Printf("Failed to cache data for key '%s': %v", cacheKey, err)
-		}
 	}
 
 	return tourCore, totalPage, nil

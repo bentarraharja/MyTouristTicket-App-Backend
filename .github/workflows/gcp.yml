@@ -48,4 +48,4 @@ jobs:
             docker stop ${{ secrets.CONTAINER_NAME }}
             docker rm ${{ secrets.CONTAINER_NAME }}
             docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}
-            docker run --name ${{ secrets.CONTAINER_NAME }} -d -p 80:8080 -e DBHOST=${{ secrets.DBHOST }} -e DBUSER=${{ secrets.DBUSER }} -e DBPASS=${{ secrets.DBPASS }} -e DBPORT=${{ secrets.DBPORT }} -e DBNAME=${{ secrets.DBNAME }} -e JWTSECRET=${{ secrets.JWTSECRET }} -e CLDURL=${{ secrets.CLDURL }} -e MIDKEY=${{ secrets.MIDKEY }} -e MIDSANDBOX=${{ secrets.MIDSANDBOX }} -e REDIS_ADDR=${{ secrets.REDIS_ADDR }} -e REDIS_DB=${{ secrets.REDIS_DB }} ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}
+            docker run --name ${{ secrets.CONTAINER_NAME }} -d -p 80:8080 -e DBHOST=${{ secrets.DBHOST }} -e DBUSER=${{ secrets.DBUSER }} -e DBPASS=${{ secrets.DBPASS }} -e DBPORT=${{ secrets.DBPORT }} -e DBNAME=${{ secrets.DBNAME }} -e JWTSECRET=${{ secrets.JWTSECRET }} -e CLDURL=${{ secrets.CLDURL }} -e MIDKEY=${{ secrets.MIDKEY }} -e MIDSANDBOX=${{ secrets.MIDSANDBOX }} ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}

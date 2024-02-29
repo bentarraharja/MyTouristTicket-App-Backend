@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"my-tourist-ticket/app/cache"
 	"my-tourist-ticket/app/middlewares"
 	"my-tourist-ticket/utils/cloudinary"
 	"my-tourist-ticket/utils/encrypts"
@@ -39,7 +38,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitRouter(db *gorm.DB, e *echo.Echo, redisClient cache.RedisInterface) {
+func InitRouter(db *gorm.DB, e *echo.Echo) {
 	hash := encrypts.New()
 	cloudinaryUploader := cloudinary.New()
 	midtrans := externalapi.New()
@@ -52,7 +51,7 @@ func InitRouter(db *gorm.DB, e *echo.Echo, redisClient cache.RedisInterface) {
 	cityService := cs.NewCity(cityData)
 	cityHandlerAPI := ch.NewCity(cityService)
 
-	tourData := td.NewTour(db, redisClient, cloudinaryUploader)
+	tourData := td.NewTour(db, cloudinaryUploader)
 	tourService := ts.NewTour(tourData)
 	tourHandlerAPI := th.NewTour(tourService)
 
