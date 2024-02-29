@@ -5,6 +5,7 @@ go 1.21.3
 require (
 	github.com/cloudinary/cloudinary-go/v2 v2.7.0
 	github.com/go-playground/validator/v10 v10.17.0
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.4.0
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/midtrans/midtrans-go v1.3.7
@@ -15,8 +16,10 @@ require (
 )
 
 require (
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/creasty/defaults v1.5.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect

@@ -15,11 +15,14 @@ var (
 )
 
 type AppConfig struct {
-	DB_USERNAME string
-	DB_PASSWORD string
-	DB_HOSTNAME string
-	DB_PORT     int
-	DB_NAME     string
+	DB_USERNAME    string
+	DB_PASSWORD    string
+	DB_HOSTNAME    string
+	DB_PORT        int
+	DB_NAME        string
+	REDIS_ADDR     string
+	REDIS_PASSWORD string
+	REDIS_DB       int
 }
 
 func InitConfig() *AppConfig {
@@ -63,6 +66,18 @@ func ReadEnv() *AppConfig {
 		MID_KEY = val
 		isRead = false
 	}
+	if val, found := os.LookupEnv("REDIS_ADDR"); found {
+		app.REDIS_ADDR = val
+		isRead = false
+	}
+	if val, found := os.LookupEnv("REDIS_PASSWORD"); found {
+		app.REDIS_PASSWORD = val
+		isRead = false
+	}
+	if val, found := os.LookupEnv("REDIS_DB"); found {
+		app.REDIS_DB, _ = strconv.Atoi(val)
+		isRead = false
+	}
 
 	if isRead {
 		viper.AddConfigPath(".")
@@ -78,6 +93,9 @@ func ReadEnv() *AppConfig {
 		CLD_URL = viper.GetString("CLDURL")
 		JWT_SECRET = viper.GetString("JWTSECRET")
 		MID_KEY = viper.GetString("MIDKEY")
+		app.REDIS_ADDR = viper.GetString("REDIS_ADDR")
+		app.REDIS_PASSWORD = viper.GetString("REDIS_PASSWORD")
+		app.REDIS_DB, _ = strconv.Atoi(viper.Get("REDIS_DB").(string))
 		app.DB_USERNAME = viper.Get("DBUSER").(string)
 		app.DB_PASSWORD = viper.Get("DBPASS").(string)
 		app.DB_HOSTNAME = viper.Get("DBHOST").(string)
